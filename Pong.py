@@ -50,7 +50,7 @@ def main():
     ventana = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     ventana.fill(NEGRO)
     font = pygame.font.SysFont("ocraextended", 40)
-    pygame.display.set_caption("PongPruebaPULLLUCAS")
+    pygame.display.set_caption("Pong")
 
     #Sounds
     wallCollide = pygame.mixer.Sound('wallCollide.ogg')
