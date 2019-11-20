@@ -2,6 +2,15 @@ import pygame,sys
 from pygame.locals import *
 import time
 
+#CONSTANTS
+PLAYER1_NAME = ''
+PLAYER2_NAME = ''
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 600
+
+#COLORS
+WHITE = (255, 255, 255)
+BLACK = (0, 0 ,0)
 
 class balls():
     def __init__(self, color, x, y, height, width, speedX, speedY):
@@ -22,15 +31,103 @@ class padel():
         self.height = height
         self.width = width
 
+def initWindow():
+    global BLACK, WHITE, PLAYER1_NAME, PLAYER2_NAME, SCREEN_WIDTH, SCREEN_HEIGHT
+    pygame.init()
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("Pong")
+    screen.fill(BLACK)
+    runninginitWindow = True
+    pongImage = pygame.image.load("pongBackground.jpg")
+    font = pygame.font.SysFont("ocraextended", 40)
+    input_box1 = pygame.Rect((SCREEN_WIDTH/3) - 140, (SCREEN_HEIGHT - 200), 100, 50)
+    input_box2 = pygame.Rect((SCREEN_WIDTH/3) - 140, (SCREEN_HEIGHT - 100), 100, 50)
+    color_inactive = (193, 193, 193)
+    color_active = WHITE
+    color1 = color_inactive
+    color2 = color_inactive
+    active1 = False
+    active2 = False
+    text1 = 'Player 1'
+    text2 = 'Player 2'
+
+    while runninginitWindow:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                runninginitWindow = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    PLAYER1_NAME = text1
+                    PLAYER2_NAME = text2
+                    runninginitWindow = False
+                    main()
+                if active1:
+                    if event.key == pygame.K_BACKSPACE:
+                        text1 = text1[:-1]
+                    elif len(text1) < 9:
+                        text1 += event.unicode
+                if active2:
+                    if event.key == pygame.K_BACKSPACE:
+                        text2 = text2[:-1]
+                    elif len(text2) < 9:
+                        text2 += event.unicode
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box1.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active1 = not active1
+                    if text1 == 'Player 1':
+                        text1=''
+                else:
+                    active1 = False
+                # Change the current color of the input box.
+                color1 = color_active if active1 else color_inactive
+
+                if input_box2.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active2 = not active2
+                    if text2 == 'Player 2':
+                        text2=''
+                else:
+                    active2 = False
+                # Change the current color of the input box.
+                color2 = color_active if active2 else color_inactive
+
+        screen.fill(BLACK)
+
+        screen.blit(pongImage, (256, 44))
+        # Render the current text.
+        txt_surface1 = font.render(text1, True, color1)
+        # Resize the box if the text is too long.
+        width1 = max(200, txt_surface1.get_width()+10)
+        input_box1.w = width1
+        # Blit the text.
+        screen.blit(txt_surface1, (input_box1.x+5, input_box1.y+5))
+        # Blit the input_box rect.
+        pygame.draw.rect(screen, color1, input_box1, 2)
+
+        # Render the current text.
+        txt_surface2 = font.render(text2, True, color2)
+        # Resize the box if the text is too long.
+        width2 = max(200, txt_surface2.get_width() + 10)
+        input_box2.w = width2
+        # Blit the text.
+        screen.blit(txt_surface2, (input_box2.x + 5, input_box2.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(screen, color2, input_box2, 2)
+        pygame.display.update()
+
 
 
 def main():
-        #CONSTANTS
+    #CONSTANTS
     DISTANCEPADELTOWALL = 35
     PADELMOVE = 1
     SCREEN_WIDTH = 1024
     SCREEN_HEIGHT = 600
-    EFFECT_TOP = 0.05
+    EFFECT_TOP = 0.01
     EFFECT_BOT = 0.05
     BALLSPEEDX = 0.5
     BALLSPEEDY = 0.5
@@ -43,12 +140,12 @@ def main():
     b = 255
 
     #COLORES
-    BLANCO = (255, 255, 255)
-    NEGRO = (0, 0 ,0)
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0 ,0)
 
     pygame.init()
     ventana = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    ventana.fill(NEGRO)
+    ventana.fill(BLACK)
     font = pygame.font.SysFont("ocraextended", 40)
     pygame.display.set_caption("Pong")
 
@@ -58,18 +155,23 @@ def main():
     point = pygame.mixer.Sound('point.ogg')
 
 
-    ball = balls(BLANCO, 100, 100, 10, 10, BALLSPEEDX, BALLSPEEDY)
-    padel1 = padel(BLANCO, DISTANCEPADELTOWALL, 300, 100, 10)
-    padel2 = padel(BLANCO, SCREEN_WIDTH - DISTANCEPADELTOWALL - 10, 300, 100, 10)
+    ball = balls(WHITE, 100, 100, 10, 10, BALLSPEEDX, BALLSPEEDY)
+    padel1 = padel(WHITE, DISTANCEPADELTOWALL, 300, 100, 5)
+    padel2 = padel(WHITE, SCREEN_WIDTH - DISTANCEPADELTOWALL - 10, 300, 100, 5)
 
     running = True
     while running:
         for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
+                    pygame.quit()
+                    sys.exit()
                 if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
-                            running = False                          
+                            running = False
+                            pygame.quit()
+                            sys.exit()
+                            
 
         if STARTED == True:
             ball.x += ball.speedX
@@ -141,22 +243,22 @@ def main():
             rect2 = Rect(padel2.x, padel2.y, padel2.width, padel2.height)
             rectball = Rect(ball.x, ball.y, ball.width, ball.height)
 
-            if rect1.colliderect(rectball):
+            if Rect(padel1.x, padel1.y, 0, padel1.height).colliderect(rectball):
                 padelCollide.play()
                 ball.speedX *= -1
-            if rect2.colliderect(rectball):
+            if Rect(padel2.x, padel2.y, 0, padel2.height).colliderect(rectball):
                 padelCollide.play()
                 ball.speedX *= -1
                 
 
-            ventana.fill(NEGRO)
+            ventana.fill(BLACK)
 
             if PLAYER1_SCORE == 5:
-                win = font.render("PLAYER 1 WINS!!", True, BLANCO)
+                win = font.render("PLAYER 1 WINS!!", True, WHITE)
                 ventana.blit(win, (3*SCREEN_WIDTH/9, SCREEN_HEIGHT/2,10,10))
                 WINED = True
             elif PLAYER2_SCORE == 5:
-                win = font.render("PLAYER 2 WINS!!", True, BLANCO)
+                win = font.render("PLAYER 2 WINS!!", True, WHITE)
                 ventana.blit(win, (3*SCREEN_WIDTH/9, SCREEN_HEIGHT/2,10,10))
                 WINED = True
                 
@@ -164,8 +266,8 @@ def main():
 
             if WINED == False:
 
-                scoreplayer1 = font.render(str(PLAYER1_SCORE), True, BLANCO)
-                scoreplayer2 = font.render(str(PLAYER2_SCORE), True, BLANCO)
+                scoreplayer1 = font.render(str(PLAYER1_SCORE), True, WHITE)
+                scoreplayer2 = font.render(str(PLAYER2_SCORE), True, WHITE)
                 ventana.blit(scoreplayer1, (SCREEN_WIDTH / 5,40,10,10))
                 ventana.blit(scoreplayer2, ((3*SCREEN_WIDTH / 4),40,10,10))
 
@@ -178,14 +280,15 @@ def main():
                 
                 #MIDDLE LINES DRAW
                 for i in range(0, SCREEN_HEIGHT, 20):
-                    pygame.draw.line(ventana, BLANCO, (SCREEN_WIDTH/2, i), (SCREEN_WIDTH/2, i+10))
+                    pygame.draw.line(ventana, WHITE, (SCREEN_WIDTH/2, i), (SCREEN_WIDTH/2, i+10))
 
 
 
         else:
-            ventana.fill(NEGRO)
-            player1 = font.render("PLAYER 1", True, (r, g, b))
-            player2 = font.render("PLAYER 2", True, (r, g, b))
+            ventana.fill(BLACK)
+            global PLAYER1_NAME, PLAYER2_NAME
+            player1 = font.render(PLAYER1_NAME, True, (r, g, b))
+            player2 = font.render(PLAYER2_NAME, True, (r, g, b))
             ventana.blit(player1, (SCREEN_WIDTH / 6, SCREEN_HEIGHT/2,10,10))
             ventana.blit(player2, ((3*SCREEN_WIDTH / 5), SCREEN_HEIGHT/2 ,10,10))
             
@@ -227,4 +330,5 @@ def main():
             WINED = False
 
 if __name__ == "__main__":
+    initWindow()
     main()
