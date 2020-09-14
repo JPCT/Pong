@@ -4,4 +4,4 @@
 Libraries needed:
 pygame
 
-cx_Freze for the creating of the executable file, full tutorial for this here: https://www.ludc.tk/post/70/
+cx_Freze for the creating of the executable file
